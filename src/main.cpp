@@ -1,4 +1,59 @@
 #include <Arduino.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
+static TaskHandle_t receptorHandle = NULL;
+
+void emissor (void *params)
+{
+  while(true)
+  {
+    xTaskNotifyGive(receptorHandle);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+  }
+}
+
+void receptor (void *params)
+{
+
+  while(true)
+  {
+    int quantidade = ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    Serial.printf("Quantidade Recebida: %d \n", quantidade);
+  }
+}
+
+
+
+
+
+
+
+
+void setup()
+{
+  Serial.begin(9600);
+  xTaskCreate(&receptor, "receptor", 2048, NULL, 2,&receptorHandle);
+  xTaskCreate(&emissor, "emissor", 2048, NULL, 2, NULL);
+}
+
+void loop()
+{
+
+
+}
+
+
+
+
+
+
+
+
+
+/*
+
+#include <Arduino.h>
 
 xQueueHandle fila_de_temperaturas;
 float temperatura_media;
@@ -61,3 +116,5 @@ void loop()
 {
   // put your main code here, to run repeatedly:
 }
+
+*/
